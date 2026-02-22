@@ -1,147 +1,87 @@
-# 👋 Willkommen zum Clean-Code-Seminar-Projekt
+# 👋 Willkommen zum Clean-Code-Seminar
 
-Schön, dass du dabei bist! Diese Readme hilft dir beim schnellen Einstieg, damit du das Projekt lokal auschecken, starten und in deinem eigenen Branch entwickeln kannst.
+Schön, dass du da bist!
+
+**Ziel dieses Projekts:**
+Dieses Projekt enthält bewusst unaufgeräumten Code. Deine Aufgabe im Seminar ist, ihn Schritt für Schritt zu verbessern (Clean Code, Refactoring, Tests).
 
 ```text
-   ____ _                          ____          _      
-  / ___| | ___  __ _ _ __        / ___|___   __| | ___ 
- | |   | |/ _ \/ _` | '_ \_____ | |   / _ \ / _` |/ _ \
- | |___| |  __/ (_| | | | |_____| |__| (_) | (_| |  __/
-  \____|_|\___|\__,_|_| |_|      \____\___/ \__,_|\___|
+   ____ _                 _       ____          _      
+  / ___| | ___  __ _ _ __| | __  / ___|___   __| | ___ 
+ | |   | |/ _ \/ _` | '__| |/ / | |   / _ \ / _` |/ _ \
+ | |___| |  __/ (_| | |  |   <  | |__| (_) | (_| |  __/
+  \____|_|\___|\__,_|_|  |_|\_\  \____\___/ \__,_|\___|
 ```
 
 ---
 
-## 1) Voraussetzungen installieren
+## Schnellstart (fürs Seminar)
 
-### Git installieren
-Du brauchst Git, um den Code auszuchecken und mit Branches zu arbeiten.
+### 1) Voraussetzungen **prüfen**
+> Wenn etwas fehlt: bitte kurz im Team melden oder vorab nachinstallieren.
 
-- **Windows:** [https://git-scm.com/download/win](https://git-scm.com/download/win)
-- **macOS:**
-  ```bash
-  brew install git
-  ```
-- **Linux (Debian/Ubuntu):**
-  ```bash
-  sudo apt update
-  sudo apt install git
-  ```
-
-Prüfen:
 ```bash
 git --version
-```
-
-### JDK installieren (Java Development Kit)
-Für das Projekt brauchst du ein installiertes JDK.
-
-Empfohlen: **JDK 17** (oder die im Seminar genannte Version).
-
-- **Windows/macOS/Linux:** z. B. über Adoptium: [https://adoptium.net/](https://adoptium.net/)
-
-Prüfen:
-```bash
 java -version
-javac -version
 ```
 
----
+Empfohlen ist **JDK 17** (oder die im Seminar genannte Version).
 
-## 2) Projekt auschecken
-
-> ⚠️ Hinweis: Damit du auf das Repository pushen kannst, musst du vorher im Repository/der Organisation eingetragen sein.
-
-Repository klonen:
+### 2) Repository klonen
 ```bash
 git clone <REPO-URL>
 cd clean-code-workshop
 ```
 
-Beispiel für SSH:
-```bash
-git clone git@github.com:<org>/<repo>.git
-cd clean-code-workshop
-```
+### 3) Tests ausführen (Maven Wrapper)
+Du musst Maven nicht separat installieren, weil der Wrapper bereits im Projekt liegt.
 
----
-
-## 3) Projekt mit Maven Wrapper bauen & starten
-
-Das Projekt enthält den **Maven Wrapper** (`mvnw` / `mvnw.cmd`).
-Damit musst du Maven nicht separat installieren.
-
-### Build + Tests ausführen
-- **macOS/Linux:**
+- macOS/Linux:
   ```bash
   ./mvnw clean test
   ```
-- **Windows (PowerShell/CMD):**
+- Windows:
   ```powershell
   .\mvnw.cmd clean test
   ```
 
-### Anwendung starten
-- **macOS/Linux:**
+✅ Wenn die Tests laufen, bist du startklar.
+
+---
+
+## Optional (wenn im Seminar benötigt)
+
+### Anwendung per Terminal starten
+- macOS/Linux:
   ```bash
   ./mvnw exec:java -Dexec.mainClass="de.workshop.App"
   ```
-- **Windows:**
+- Windows:
   ```powershell
   .\mvnw.cmd exec:java -Dexec.mainClass="de.workshop.App"
   ```
 
----
-
-## 4) Mit Branches arbeiten
-
-### Zu einem vorhandenen Branch wechseln
+### Branch wechseln oder eigenen Branch anlegen
 ```bash
 git fetch
 git switch <branch-name>
-```
-
-### Einen eigenen Branch anlegen
-```bash
+# oder neu:
 git switch -c feature/<dein-name>-<thema>
 ```
 
-Beispiel:
+### Änderungen committen
 ```bash
-git switch -c feature/max-refactoring-user-service
+git add .
+git commit -m "feat: kurze beschreibung"
 ```
 
----
+### Push (nur wenn gewünscht)
+```bash
+git push -u origin <dein-branch>
+```
 
-## 5) Änderungen committen
-
-1. Dateien ändern
-2. Status prüfen:
-   ```bash
-   git status
-   ```
-3. Änderungen stagen:
-   ```bash
-   git add .
-   ```
-4. Commit erstellen:
-   ```bash
-   git commit -m "feat: kurze beschreibung deiner änderung"
-   ```
-5. Branch hochladen:
-   ```bash
-   git push -u origin <dein-branch>
-   ```
+> Hinweis: Für Push-/Schreibrechte musst du im Repository eingetragen sein.
 
 ---
 
-## 6) Kurze Team-Regeln fürs Seminar
-
-- Arbeite immer in einem eigenen Branch.
-- Schreibe kleine, verständliche Commits.
-- Bei Fragen oder fehlenden Rechten: kurz beim Seminar-Team melden.
-- **Wichtig:** Für Schreib-/Push-Rechte musst du im Repository eingetragen sein.
-
----
-
-Viel Erfolg und vor allem viel Spaß beim gemeinsamen Clean-Coding! 🚀
+Viel Erfolg und viel Spaß beim Refactoring! 🚀
