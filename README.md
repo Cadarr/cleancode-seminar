@@ -6,11 +6,13 @@ Schön, dass du da bist!
 Dieses Projekt enthält bewusst unaufgeräumten Code. Deine Aufgabe im Seminar ist, ihn Schritt für Schritt zu verbessern (Clean Code, Refactoring, Tests).
 
 ```text
-   ____ _                 _       ____          _      
-  / ___| | ___  __ _ _ __| | __  / ___|___   __| | ___ 
- | |   | |/ _ \/ _` | '__| |/ / | |   / _ \ / _` |/ _ \
- | |___| |  __/ (_| | |  |   <  | |__| (_) | (_| |  __/
-  \____|_|\___|\__,_|_|  |_|\_\  \____\___/ \__,_|\___|
+   _____ _                      ____          _      
+  / ____| |                    / ___|___   __| | ___ 
+ | |    | | ___  __ _ _ __    | |   / _ \ / _` |/ _ \
+ | |____| |/ _ \/ _` | '_ \   | |__| (_) | (_| |  __/
+  \_____|_|\___/\__,_|_| |_|   \____\___/ \__,_|\___|
+
+              C L E A N   C O D E
 ```
 
 ---
