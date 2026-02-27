@@ -99,7 +99,7 @@ public class App {
             }
 
             String[] parts = line.trim().split("\\s+");
-            String command = parts[0].toUpperCase(Locale.ROOT);
+            String command = extractCommand(parts);
 
             if (command.equals("QUIT") || command.equals("ENDE")) {
                 printQuitMessage();
@@ -144,6 +144,10 @@ public class App {
     }
 
     // Parser
+    private String extractCommand(String[] parts) {
+        return parts[0].toUpperCase(Locale.ROOT);
+    }
+
     private String extractPlate(String[] parts) {
         if (parts.length < 2) {
             printNoPlateError();
