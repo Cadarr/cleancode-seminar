@@ -14,19 +14,19 @@ public class UseCases {
 
     private static final int MAX_DAILY_FEE = 20;
 
-    private Time time;
+    private Clock clock;
     private Map<String, ParkingTicket> ticketsById;
     private Output output;
 
-    public UseCases(Time time, Map<String, ParkingTicket> ticketsById, Output output) {
-        this.time = time;
+    public UseCases(Clock clock, Map<String, ParkingTicket> ticketsById, Output output) {
+        this.clock = clock;
         this.ticketsById = ticketsById;
         this.output = output;
     }
 
     public void registerEntry(ParkingReport report, String plate) {
         String ticketId = UUID.randomUUID().toString();
-        LocalDateTime now = time.now();
+        LocalDateTime now = clock.now();
 
         ParkingTicket newTicket = new ParkingTicket(plate, now);
         ticketsById.put(ticketId, newTicket);
@@ -38,7 +38,7 @@ public class UseCases {
 
     public void registerExit(ParkingReport report, String ticketId, ParkingTicket ticket) {
         LocalDateTime enterTime = ticket.getEnterTime();
-        LocalDateTime exitTime = time.now();
+        LocalDateTime exitTime = clock.now();
 
         long minutes = Duration.between(enterTime, exitTime).toMinutes();
         if (minutes < 0) {

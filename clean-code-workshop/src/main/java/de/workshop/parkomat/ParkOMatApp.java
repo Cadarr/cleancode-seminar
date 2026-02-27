@@ -9,17 +9,17 @@ public class ParkOMatApp {
     private Output output;
     private Parser parser;
 
-    private Time time;
+    private Clock clock;
 
     private Map<String, ParkingTicket> ticketsById = new HashMap<>();
     private ParkingReport report = new ParkingReport();
-    private UseCases useCases = new UseCases(time, ticketsById, output);
+    private UseCases useCases = new UseCases(clock, ticketsById, output);
 
-    public ParkOMatApp(Input input, Output output, Parser parser, Time time) {
+    public ParkOMatApp(Input input, Output output, Parser parser, Clock clock) {
         this.input = input;
         this.output = output;
         this.parser = parser;
-        this.time = time;
+        this.clock = clock;
     }
 
     public void run() {
