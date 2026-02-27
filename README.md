@@ -1,3 +1,38 @@
+Hier die einzelnen Schritte:
+
+Phase 1:
+Schritt 1: Domain-Daten bündeln
+https://github.com/Cadarr/cleancode-seminar/commit/2fc4d56576079032dbf277699c7f123107bbd4b3
+
+Schritt 2: Boundaries schneiden
+https://github.com/Cadarr/cleancode-seminar/commit/5ae1e09d339585c16c1854e6a732f0dbb9baad86
+
+Schritt 3: Happy Path freilegen 
+Hier gab es keine Änderungen
+
+Schritt 4: Abstraktionsebenen trennen
+https://github.com/Cadarr/cleancode-seminar/commit/b415ee0b6a3584dd8e8ec777ee8ee3a67b37d76e
+
+Schritt 5: Seiteneffekte lokalisieren
+https://github.com/Cadarr/cleancode-seminar/commit/1a2f7b22d30bae241b762f2719fb8c28dcb2abf0
+
+Schritt 6: Intention klarmachen
+https://github.com/Cadarr/cleancode-seminar/commit/1e27177a59bf7b053e32bf9300c91cb57d717b48
+
+Phase 2:
+Schritt 7: Module/Klassen entlang der Boundaries schneiden
+https://github.com/Cadarr/cleancode-seminar/commit/dfe887cf7b43b3856ed4f165df84eecb2b3379d6
+
+Schritt 8: Abhängigkeiten umdrehen
+https://github.com/Cadarr/cleancode-seminar/commit/29e279b02754a54ef27cc06fdc6ebefb12bd3414
+
+Schritt 9: Polymorphie statt Bedingungen
+Aktueller Stand...
+https://github.com/Cadarr/cleancode-seminar/commit/3430273bd36967de7083f9abc6c55ae007761aa0
+
+
+
+
 # 👋 Willkommen zum Clean-Code-Seminar
 
 Schön, dass du da bist!
