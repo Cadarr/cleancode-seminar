@@ -9,74 +9,102 @@ public class ParkOMatApp {
     private Output output;
     private Parser parser;
 
-    private Clock clock;
-
     private Map<String, ParkingTicket> ticketsById = new HashMap<>();
     private ParkingReport report = new ParkingReport();
-    private UseCases useCases = new UseCases(clock, ticketsById, output);
+    private UseCases useCases;
+
+    private Map<String, CommandHandler> handlers = new HashMap<>();
+    private CommandHandler unknownHandler = parts -> {
+        output.printUnknownCommandError();
+        return LoopAction.CONTINUE;
+    };
+
+    enum LoopAction {
+        CONTINUE,
+        QUIT
+    }
+
+    public interface CommandHandler {
+        LoopAction handle(String[] parts);
+    }
 
     public ParkOMatApp(Input input, Output output, Parser parser, Clock clock) {
         this.input = input;
         this.output = output;
         this.parser = parser;
-        this.clock = clock;
+        useCases = new UseCases(clock, ticketsById, output);
+        setupCommandHandlers();
+    }
+
+    private void setupCommandHandlers() {
+        handlers.put("HELP", parts -> {
+            output.printHelpMessage();
+            return LoopAction.CONTINUE;
+        });
+
+        handlers.put("REPORT", parts -> {
+            output.printReport(report);
+            return LoopAction.CONTINUE;
+        });
+
+        handlers.put("QUIT", parts -> {
+            output.printQuitMessage();
+            return LoopAction.QUIT;
+        });
+
+        handlers.put("ENDE", handlers.get("QUIT"));
+
+        handlers.put("ENTER", parts -> {
+            String plate = parser.extractPlate(parts);
+            if (plate == null)
+                return LoopAction.CONTINUE;
+
+            useCases.registerEntry(report, plate);
+            return LoopAction.CONTINUE;
+        });
+
+        handlers.put("EXIT", parts -> {
+            String ticketId = parser.extractTicketId(parts);
+            if (ticketId == null)
+                return LoopAction.CONTINUE;
+
+            if (!ticketsById.containsKey(ticketId)) {
+                output.printNoTicketError();
+                return LoopAction.CONTINUE;
+            }
+
+            ParkingTicket ticket = ticketsById.get(ticketId);
+
+            if (ticket.isClosed()) {
+                output.printTicketAlreadyClosedError(ticket);
+                return LoopAction.CONTINUE;
+            }
+
+            useCases.registerExit(report, ticketId, ticket);
+            return LoopAction.CONTINUE;
+        });
     }
 
     public void run() {
         output.printWelcomeMessage();
 
-        while (true) {
-            String line = input.readCommandLine();
-            if (line == null) {
-                break;
-            }
+        String line;
+        while ((line = input.readCommandLine()) != null) {
 
-            if (line.isEmpty()) {
+            if (line.isEmpty())
                 continue;
-            }
 
-            String[] parts = line.trim().split("\\s+");
+            String[] parts = line.split("\\s+");
             String command = parser.extractCommand(parts);
 
-            if (command.equals("QUIT") || command.equals("ENDE")) {
-                output.printQuitMessage();
+            CommandHandler handler = handlers.getOrDefault(command, unknownHandler);
+
+            LoopAction action = handler.handle(parts);
+
+            if (action == LoopAction.QUIT) {
                 break;
-            } else if (command.equals("HELP")) {
-                output.printHelpMessage();
-            } else if (command.equals("ENTER")) {
-                String plate = parser.extractPlate(parts);
-                if (plate == null) {
-                    continue;
-                }
-
-                useCases.registerEntry(report, plate);
-            } else if (command.equals("EXIT")) {
-                String ticketId = parser.extractTicketId(parts);
-
-                if (ticketId == null) {
-                    continue;
-                }
-
-                if (!ticketsById.containsKey(ticketId)) {
-                    output.printNoTicketError();
-                    continue;
-                }
-
-                ParkingTicket ticket = ticketsById.get(ticketId);
-
-                if (ticket.isClosed()) {
-                    output.printTicketAlreadyClosedError(ticket);
-                    continue;
-                }
-
-                useCases.registerExit(report, ticketId, ticket);
-            } else if (command.equals("REPORT")) {
-                output.printReport(report);
-            } else {
-                output.printUnknownCommandError();
             }
         }
-
     }
 
 }
