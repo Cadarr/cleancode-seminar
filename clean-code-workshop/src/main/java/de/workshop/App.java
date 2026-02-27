@@ -13,20 +13,82 @@ public class App {
         return "Hallo Welt";
     }
 
+    public class Ticket {
+        private String plate;
+        private LocalDateTime enterTime;
+        private boolean closed;
+        private int price;
 
-    public static void main(String[] args) {
+        public Ticket(String plate, LocalDateTime enterTime) {
+            this.plate = plate;
+            this.enterTime = enterTime;
+        }
+
+        public String getPlate() {
+            return plate;
+        }
+
+        public LocalDateTime getEnterTime() {
+            return enterTime;
+        }
+
+        public boolean isClosed() {
+            return closed;
+        }
+
+        public void closeTicket() {
+            this.closed = true;
+        }
+
+        public int getPrice() {
+            return price;
+        }
+
+        public void setPrice(int price) {
+            this.price = price;
+        }
+    }
+
+    public class Report {
+        private int totalTickets = 0;
+        private int finishedTickets = 0;
+        private int revenue = 0;
+
+        public int getTotalTickets() {
+            return totalTickets;
+        }
+
+        public void recordTicketCreation() {
+            this.totalTickets++;
+        }
+
+        public int getFinishedTickets() {
+            return finishedTickets;
+        }
+
+        public void recordClosedTicket() {
+            this.finishedTickets++;
+        }
+
+        public void recordRevenue(int amount) {
+            this.revenue = this.revenue + amount;
+        }
+
+        public double getRevenue() {
+            return revenue;
+        }
+
+    }
+
+    public void runParkOMat() {
         Scanner scanner = new Scanner(System.in);
 
-        Map<String, String> plateByTicket = new HashMap<>();
-        Map<String, LocalDateTime> enterTimeByTicket = new HashMap<>();
-        Map<String, Boolean> closedByTicket = new HashMap<>();
-        Map<String, Integer> priceByTicket = new HashMap<>();
+        Map<String, Ticket> tickets = new HashMap<>();
 
-        int totalTickets = 0;
-        int finishedTickets = 0;
-        double revenue = 0;
+        Report report = new Report();
 
-        System.out.println("Park-O-Mat gestartet. Befehle: ENTER <plate>, EXIT <ticketId>, REPORT, HELP, QUIT/ENDE");
+        System.out
+                .println("Park-O-Mat gestartet. Befehle: ENTER <plate>, EXIT <ticketId>, REPORT, HELP, QUIT/ENDE");
 
         while (true) {
             System.out.print("> ");
@@ -60,11 +122,10 @@ public class App {
                 String ticketId = UUID.randomUUID().toString();
                 LocalDateTime now = LocalDateTime.now();
 
-                plateByTicket.put(ticketId, plate);
-                enterTimeByTicket.put(ticketId, now);
-                closedByTicket.put(ticketId, false);
+                Ticket newTicket = new Ticket(plate, now);
+                tickets.put(ticketId, newTicket);
 
-                totalTickets++;
+                report.recordTicketCreation();
 
                 System.out.println("Ticket erstellt: " + ticketId);
                 System.out.println("Einfahrt: " + now);
@@ -75,18 +136,21 @@ public class App {
                 }
 
                 String ticketId = parts[1];
-                if (!enterTimeByTicket.containsKey(ticketId)) {
+
+                if (!tickets.containsKey(ticketId)) {
                     System.out.println("Fehler: Ticket nicht gefunden.");
                     continue;
                 }
 
-                if (closedByTicket.get(ticketId)) {
+                Ticket ticket = tickets.get(ticketId);
+
+                if (ticket.isClosed()) {
                     System.out.println("Fehler: Ticket ist bereits abgeschlossen.");
-                    System.out.println("Bereits bezahlt: " + priceByTicket.get(ticketId) + " €");
+                    System.out.println("Bereits bezahlt: " + ticket.getPrice() + " €");
                     continue;
                 }
 
-                LocalDateTime enterTime = enterTimeByTicket.get(ticketId);
+                LocalDateTime enterTime = ticket.getEnterTime();
                 LocalDateTime exitTime = LocalDateTime.now();
 
                 long minutes = Duration.between(enterTime, exitTime).toMinutes();
@@ -108,20 +172,21 @@ public class App {
                     price = 20;
                 }
 
-                closedByTicket.put(ticketId, true);
-                priceByTicket.put(ticketId, price);
-                finishedTickets++;
-                revenue += price;
+                ticket.setPrice(price);
+                ticket.closeTicket();
+
+                report.recordClosedTicket();
+                report.recordRevenue(price);
 
                 System.out.println("Ticket: " + ticketId);
-                System.out.println("Kennzeichen: " + plateByTicket.get(ticketId));
+                System.out.println("Kennzeichen: " + ticket.plate);
                 System.out.println("Parkdauer: " + minutes + " Minuten");
                 System.out.println("Preis: " + price + " €");
             } else if (command.equals("REPORT")) {
                 System.out.println("----- REPORT -----");
-                System.out.println("Ausgegebene Tickets: " + totalTickets);
-                System.out.println("Abgeschlossene Parkvorgaenge: " + finishedTickets);
-                System.out.println("Gesamtumsatz: " + String.format(Locale.GERMANY, "%.2f", revenue) + " €");
+                System.out.println("Ausgegebene Tickets: " + report.getTotalTickets());
+                System.out.println("Abgeschlossene Parkvorgaenge: " + report.getFinishedTickets());
+                System.out.println("Gesamtumsatz: " + report.getRevenue() + " €");
                 System.out.println("------------------");
             } else {
                 System.out.println("Unbekannter Befehl. Mit HELP bekommst du Hilfe.");
@@ -130,4 +195,10 @@ public class App {
 
         scanner.close();
     }
+
+    public static void main(String[] args) {
+        App app = new App();
+        app.runParkOMat();
+    }
+
 }
