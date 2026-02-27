@@ -247,7 +247,7 @@ public class App {
 
     private void registerExit(Report report, String ticketId, Ticket ticket) {
         LocalDateTime enterTime = ticket.getEnterTime();
-        LocalDateTime exitTime = LocalDateTime.now();
+        LocalDateTime exitTime = now();
 
         long minutes = Duration.between(enterTime, exitTime).toMinutes();
         if (minutes < 0) {
@@ -279,7 +279,7 @@ public class App {
 
     private void registerEntry(Report report, String plate) {
         String ticketId = UUID.randomUUID().toString();
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = now();
 
         Ticket newTicket = new Ticket(plate, now);
         tickets.put(ticketId, newTicket);
@@ -287,6 +287,11 @@ public class App {
         report.recordTicketCreation();
 
         printEnterMessage(ticketId, now);
+    }
+
+    // Side effects
+    protected LocalDateTime now() {
+        return LocalDateTime.now();
     }
 
     public static void main(String[] args) {
