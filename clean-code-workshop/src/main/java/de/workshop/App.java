@@ -74,30 +74,27 @@ public class App {
             this.revenue = this.revenue + amount;
         }
 
-        public double getRevenue() {
+        public int getRevenue() {
             return revenue;
         }
-
     }
 
-    public void runParkOMat() {
-        Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
+    private Map<String, Ticket> tickets = new HashMap<>();
 
-        Map<String, Ticket> tickets = new HashMap<>();
+    public void runParkOMat() {
 
         Report report = new Report();
 
-        System.out
-                .println("Park-O-Mat gestartet. Befehle: ENTER <plate>, EXIT <ticketId>, REPORT, HELP, QUIT/ENDE");
+        printWelcomeMessage();
 
         while (true) {
-            System.out.print("> ");
-            if (!scanner.hasNextLine()) {
+            String line = readNextCommandLine();
+            if (line == null) {
                 break;
             }
 
-            String line = scanner.nextLine();
-            if (line == null || line.trim().isEmpty()) {
+            if (line.isEmpty()) {
                 continue;
             }
 
@@ -105,95 +102,187 @@ public class App {
             String command = parts[0].toUpperCase(Locale.ROOT);
 
             if (command.equals("QUIT") || command.equals("ENDE")) {
-                System.out.println("Programm beendet.");
+                printQuitMessage();
                 break;
             } else if (command.equals("HELP")) {
-                System.out.println("ENTER <plate>  - Neues Ticket erzeugen");
-                System.out.println("EXIT <ticketId> - Ticket abrechnen");
-                System.out.println("REPORT         - Statistik anzeigen");
-                System.out.println("QUIT oder ENDE - Programm beenden");
+                printHelpMessage();
             } else if (command.equals("ENTER")) {
-                if (parts.length < 2) {
-                    System.out.println("Fehler: Bitte Kennzeichen angeben. Beispiel: ENTER B-AB123");
+                String plate = extractPlate(parts);
+                if (plate == null) {
                     continue;
                 }
 
-                String plate = parts[1];
-                String ticketId = UUID.randomUUID().toString();
-                LocalDateTime now = LocalDateTime.now();
-
-                Ticket newTicket = new Ticket(plate, now);
-                tickets.put(ticketId, newTicket);
-
-                report.recordTicketCreation();
-
-                System.out.println("Ticket erstellt: " + ticketId);
-                System.out.println("Einfahrt: " + now);
+                registerEntry(report, plate);
             } else if (command.equals("EXIT")) {
-                if (parts.length < 2) {
-                    System.out.println("Fehler: Bitte Ticket-ID angeben. Beispiel: EXIT <ticketId>");
+                String ticketId = extractTicketId(parts);
+
+                if (ticketId == null) {
                     continue;
                 }
-
-                String ticketId = parts[1];
 
                 if (!tickets.containsKey(ticketId)) {
-                    System.out.println("Fehler: Ticket nicht gefunden.");
+                    printNoTicketError();
                     continue;
                 }
 
                 Ticket ticket = tickets.get(ticketId);
 
                 if (ticket.isClosed()) {
-                    System.out.println("Fehler: Ticket ist bereits abgeschlossen.");
-                    System.out.println("Bereits bezahlt: " + ticket.getPrice() + " €");
+                    printTicketAlreadyClosedError(ticket);
                     continue;
                 }
 
-                LocalDateTime enterTime = ticket.getEnterTime();
-                LocalDateTime exitTime = LocalDateTime.now();
-
-                long minutes = Duration.between(enterTime, exitTime).toMinutes();
-                if (minutes < 0) {
-                    minutes = 0;
-                }
-
-                int startedHours = (int) Math.ceil(minutes / 60.0);
-
-                int price;
-                if (startedHours <= 1) {
-                    // bis 60 Minuten nur Grundgebühr
-                    price = 2;
-                } else {
-                    price = 2 + (startedHours - 1) * 3;
-                }
-
-                if (price > 20) {
-                    price = 20;
-                }
-
-                ticket.setPrice(price);
-                ticket.closeTicket();
-
-                report.recordClosedTicket();
-                report.recordRevenue(price);
-
-                System.out.println("Ticket: " + ticketId);
-                System.out.println("Kennzeichen: " + ticket.plate);
-                System.out.println("Parkdauer: " + minutes + " Minuten");
-                System.out.println("Preis: " + price + " €");
+                registerExit(report, ticketId, ticket);
             } else if (command.equals("REPORT")) {
-                System.out.println("----- REPORT -----");
-                System.out.println("Ausgegebene Tickets: " + report.getTotalTickets());
-                System.out.println("Abgeschlossene Parkvorgaenge: " + report.getFinishedTickets());
-                System.out.println("Gesamtumsatz: " + report.getRevenue() + " €");
-                System.out.println("------------------");
+                printReport(report);
             } else {
-                System.out.println("Unbekannter Befehl. Mit HELP bekommst du Hilfe.");
+                printUnknownCommandError();
             }
         }
 
         scanner.close();
+    }
+
+    // Parser
+    private String extractPlate(String[] parts) {
+        if (parts.length < 2) {
+            printNoPlateError();
+            return null;
+        }
+        return parts[1];
+    }
+
+    private String extractTicketId(String[] parts) {
+        if (parts.length < 2) {
+            printNoIdError();
+            return null;
+        }
+        return parts[1];
+    }
+
+    // Input
+
+    private String readNextCommandLine() {
+        printCommandPrompt();
+
+        if (!scanner.hasNextLine()) {
+            return null;
+        }
+
+        String line = scanner.nextLine();
+        if (line == null || line.trim().isEmpty()) {
+            return "";
+        }
+
+        return line.trim();
+    }
+
+    // Output
+    private void printCommandPrompt() {
+        System.out.print("> ");
+    }
+
+    private void printWelcomeMessage() {
+        System.out
+                .println("Park-O-Mat gestartet. Befehle: ENTER <plate>, EXIT <ticketId>, REPORT, HELP, QUIT/ENDE");
+    }
+
+    private void printQuitMessage() {
+        System.out.println("Programm beendet.");
+    }
+
+    private void printHelpMessage() {
+        System.out.println("ENTER <plate>  - Neues Ticket erzeugen");
+        System.out.println("EXIT <ticketId> - Ticket abrechnen");
+        System.out.println("REPORT         - Statistik anzeigen");
+        System.out.println("QUIT oder ENDE - Programm beenden");
+    }
+
+    private void printNoPlateError() {
+        System.out.println("Fehler: Bitte Kennzeichen angeben. Beispiel: ENTER B-AB123");
+    }
+
+    private void printEnterMessage(String ticketId, LocalDateTime now) {
+        System.out.println("Ticket erstellt: " + ticketId);
+        System.out.println("Einfahrt: " + now);
+    }
+
+    private void printNoIdError() {
+        System.out.println("Fehler: Bitte Ticket-ID angeben. Beispiel: EXIT <ticketId>");
+    }
+
+    private void printNoTicketError() {
+        System.out.println("Fehler: Ticket nicht gefunden.");
+    }
+
+    private void printTicketAlreadyClosedError(Ticket ticket) {
+        System.out.println("Fehler: Ticket ist bereits abgeschlossen.");
+        System.out.println("Bereits bezahlt: " + ticket.getPrice() + " €");
+    }
+
+    private void printExitMessage(String ticketId, Ticket ticket, long minutes, int price) {
+        System.out.println("Ticket: " + ticketId);
+        System.out.println("Kennzeichen: " + ticket.plate);
+        System.out.println("Parkdauer: " + minutes + " Minuten");
+        System.out.println("Preis: " + price + " €");
+    }
+
+    private void printReport(Report report) {
+        System.out.println("----- REPORT -----");
+        System.out.println("Ausgegebene Tickets: " + report.getTotalTickets());
+        System.out.println("Abgeschlossene Parkvorgaenge: " + report.getFinishedTickets());
+        System.out.println("Gesamtumsatz: " + report.getRevenue() + " €");
+        System.out.println("------------------");
+    }
+
+    private void printUnknownCommandError() {
+        System.out.println("Unbekannter Befehl. Mit HELP bekommst du Hilfe.");
+    }
+
+    // Businesslogik
+
+    private void registerExit(Report report, String ticketId, Ticket ticket) {
+        LocalDateTime enterTime = ticket.getEnterTime();
+        LocalDateTime exitTime = LocalDateTime.now();
+
+        long minutes = Duration.between(enterTime, exitTime).toMinutes();
+        if (minutes < 0) {
+            minutes = 0;
+        }
+
+        int startedHours = (int) Math.ceil(minutes / 60.0);
+
+        int price;
+        if (startedHours <= 1) {
+            // bis 60 Minuten nur Grundgebühr
+            price = 2;
+        } else {
+            price = 2 + (startedHours - 1) * 3;
+        }
+
+        if (price > 20) {
+            price = 20;
+        }
+
+        ticket.setPrice(price);
+        ticket.closeTicket();
+
+        report.recordClosedTicket();
+        report.recordRevenue(price);
+
+        printExitMessage(ticketId, ticket, minutes, price);
+    }
+
+    private void registerEntry(Report report, String plate) {
+        String ticketId = UUID.randomUUID().toString();
+        LocalDateTime now = LocalDateTime.now();
+
+        Ticket newTicket = new Ticket(plate, now);
+        tickets.put(ticketId, newTicket);
+
+        report.recordTicketCreation();
+
+        printEnterMessage(ticketId, now);
     }
 
     public static void main(String[] args) {
